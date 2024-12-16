@@ -1,13 +1,14 @@
 # monitoring/prometheus/prometheus.yml
+
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 15s  # Intervalle de temps entre chaque collecte de métriques (15 secondes)
+  evaluation_interval: 15s  # Intervalle de temps entre chaque évaluation des règles (Alertes ou recording) (15 secondes)
 
 scrape_configs:
-  - job_name: 'frontend'
+  - job_name: 'frontend'  # Nom du job pour identifier la cible du frontend
     static_configs:
-      - targets: ['frontend:3000']
+      - targets: ['frontend:3000']  # Adresse et port de l'application frontend à surveiller
 
-  - job_name: 'prometheus'
+  - job_name: 'prometheus'  # Nom du job pour surveiller Prometheus lui-même
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['localhost:9090']  # Adresse et port où Prometheus est accessible pour l'auto-surveillance

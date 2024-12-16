@@ -1,0 +1,45 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Next.js
+.next/
+out/
+
+# Production
+build
+dist
+
+# Docker volumes
+data/postgres/*
+!data/postgres/.gitkeep
+monitoring/grafana/data/*
+!monitoring/grafana/data/.gitkeep
+
+# Misc
+.DS_Store
+*.pem
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local Netlify folder
+.netlify
+
+# Vercel
+.vercel

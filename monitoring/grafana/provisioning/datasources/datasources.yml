@@ -1,0 +1,9 @@
+apiVersion: 1  # Version de l'API de provisioning utilisée par Grafana
+
+datasources:  # Liste des sources de données à provisionner
+  - name: Prometheus  # Nom de la source de données tel qu'il apparaîtra dans Grafana
+    type: prometheus  # Type de la source de données, ici Prometheus
+    access: proxy  # Méthode d'accès utilisée par Grafana pour interroger la source de données. 'proxy' signifie que Grafana agit en tant que proxy.
+    url: http://prometheus:9090  # URL de la source de données Prometheus. Ici, Grafana accédera à Prometheus via le service Docker nommé 'prometheus' sur le port 9090
+    isDefault: true  # Indique que cette source de données sera la source par défaut pour les nouveaux tableaux de bord
+    editable: false  # Empêche la modification de cette source de données via l'interface utilisateur de Grafana

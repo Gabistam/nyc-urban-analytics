@@ -1,0 +1,11 @@
+apiVersion: 1  # Version de l'API de provisioning utilisée par Grafana
+
+providers:  # Liste des fournisseurs de tableaux de bord (dashboards) à provisionner
+  - name: 'Default'  # Nom du fournisseur de tableaux de bord
+    orgId: 1  # Identifiant de l'organisation Grafana à laquelle les tableaux de bord seront assignés
+    folder: ''  # Nom du dossier dans Grafana où les tableaux de bord seront placés. Une chaîne vide indique le dossier racine
+    type: file  # Type de fournisseur, ici 'file' signifie que les tableaux de bord sont fournis via des fichiers
+    disableDeletion: true  # Empêche la suppression des tableaux de bord provisionnés via l'interface Grafana
+    editable: false  # Rend les tableaux de bord provisionnés non éditables via l'interface Grafana
+    options:  # Options spécifiques au type de fournisseur
+      path: /etc/grafana/provisioning/dashboards  # Chemin du répertoire contenant les fichiers de tableaux de bord à provisionner

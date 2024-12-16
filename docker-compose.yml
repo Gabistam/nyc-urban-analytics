@@ -1,67 +1,67 @@
-version: '3.8'
+version: '3.8'  # Version de Docker Compose utilisée
 
-services:
-  frontend:
-    build:
-      context: ./frontend
-      target: development
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "3050:3100"
-    environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
-    depends_on:
-      - postgres
+services:  # Définition des services à déployer
+  frontend:  # Service pour l'application frontend
+    build:  # Configuration de la construction de l'image Docker
+      context: ./frontend  # Répertoire contenant le Dockerfile pour le frontend
+      target: development  # Étape de build ciblée dans le Dockerfile (par exemple, stage 'development')
+    volumes:  # Montage des volumes pour le service frontend
+      - ./frontend:/app  # Monte le répertoire local ./frontend dans /app à l'intérieur du conteneur
+      - /app/node_modules  # Monte un volume anonyme pour /app/node_modules afin de préserver les dépendances
+    ports:  # Mappage des ports entre l'hôte et le conteneur
+      - "3100:3000"  # Mappe le port 3000 du conteneur au port 3100 de l'hôte
+    environment:  # Variables d'environnement pour le service frontend
+      - NODE_ENV=development  # Définit l'environnement Node.js en mode développement
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api  # URL publique de l'API utilisée par le frontend
+    depends_on:  # Dépendances de service
+      - postgres  # Le service frontend dépend du service postgres
 
-  postgres:
-    image: postgres:15-alpine
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-      - ./data/init-scripts:/docker-entrypoint-initdb.d
-    environment:
-      - POSTGRES_USER=urbanadmin
-      - POSTGRES_PASSWORD=urbanpass
-      - POSTGRES_DB=nycurban
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U urbanadmin -d nycurban"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  postgres:  # Service pour la base de données PostgreSQL
+    image: postgres:15-alpine  # Utilise l'image officielle PostgreSQL version 15 basée sur Alpine Linux
+    volumes:  # Montage des volumes pour le service postgres
+      - ./data/postgres:/var/lib/postgresql/data  # Monte le répertoire local ./data/postgres dans le répertoire de données de PostgreSQL
+      - ./data/init-scripts:/docker-entrypoint-initdb.d  # Monte les scripts d'initialisation dans le répertoire d'initialisation de PostgreSQL
+    environment:  # Variables d'environnement pour le service postgres
+      - POSTGRES_USER=urbanadmin  # Nom d'utilisateur PostgreSQL
+      - POSTGRES_PASSWORD=urbanpass  # Mot de passe pour l'utilisateur PostgreSQL
+      - POSTGRES_DB=nycurban  # Nom de la base de données par défaut
+    ports:  # Mappage des ports entre l'hôte et le conteneur
+      - "5432:5432"  # Mappe le port 5432 du conteneur au port 5432 de l'hôte
+    healthcheck:  # Configuration du contrôle de santé pour s'assurer que PostgreSQL est prêt
+      test: ["CMD-SHELL", "pg_isready -U urbanadmin -d nycurban"]  # Commande pour vérifier la disponibilité de PostgreSQL
+      interval: 10s  # Intervalle entre chaque test de santé
+      timeout: 5s  # Délai d'attente avant qu'un test soit considéré comme échoué
+      retries: 5  # Nombre de tentatives avant de considérer le conteneur comme non sain
 
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - "9090:9090"
-    depends_on:
-      - frontend
+  prometheus:  # Service pour Prometheus (système de surveillance et d'alerte)
+    image: prom/prometheus:latest  # Utilise l'image officielle Prometheus la plus récente
+    volumes:  # Montage des volumes pour le service Prometheus
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml  # Monte le fichier de configuration Prometheus personnalisé
+      - prometheus_data:/prometheus  # Monte un volume nommé pour stocker les données de Prometheus
+    command:  # Commandes supplémentaires pour configurer Prometheus
+      - '--config.file=/etc/prometheus/prometheus.yml'  # Spécifie le fichier de configuration Prometheus
+      - '--storage.tsdb.path=/prometheus'  # Spécifie le chemin de stockage des données temporelles
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'  # Chemin des bibliothèques de la console web
+      - '--web.console.templates=/usr/share/prometheus/consoles'  # Chemin des templates de la console web
+    ports:  # Mappage des ports entre l'hôte et le conteneur
+      - "9090:9090"  # Mappe le port 9090 du conteneur au port 9090 de l'hôte
+    depends_on:  # Dépendances de service
+      - frontend  # Prometheus dépend du service frontend
 
-  grafana:
-    image: grafana/grafana:latest
-    volumes:
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-      - grafana_data:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=grafanapass
-      - GF_USERS_ALLOW_SIGN_UP=false
-    ports:
-      - "3001:3000"
-    depends_on:
-      - prometheus
+  grafana:  # Service pour Grafana (plateforme de visualisation et d'analyse)
+    image: grafana/grafana:latest  # Utilise l'image officielle Grafana la plus récente
+    volumes:  # Montage des volumes pour le service Grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning  # Monte les configurations de provisioning de Grafana
+      - grafana_data:/var/lib/grafana  # Monte un volume nommé pour stocker les données de Grafana
+    environment:  # Variables d'environnement pour le service Grafana
+      - GF_SECURITY_ADMIN_USER=admin  # Nom d'utilisateur administrateur de Grafana
+      - GF_SECURITY_ADMIN_PASSWORD=grafanapass  # Mot de passe administrateur de Grafana
+      - GF_USERS_ALLOW_SIGN_UP=false  # Désactive l'inscription des utilisateurs
+    ports:  # Mappage des ports entre l'hôte et le conteneur
+      - "3001:3000"  # Mappe le port 3000 du conteneur au port 3001 de l'hôte
+    depends_on:  # Dépendances de service
+      - prometheus  # Grafana dépend du service Prometheus
 
-volumes:
-  prometheus_data:
-  grafana_data:
+volumes:  # Définition des volumes nommés utilisés par les services
+  prometheus_data:  # Volume nommé pour stocker les données de Prometheus
+  grafana_data:  # Volume nommé pour stocker les données de Grafana

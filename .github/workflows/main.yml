@@ -1,0 +1,60 @@
+# .github/workflows/main.yml
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      # Run tests and lint
+      - name: Run tests and lint
+        working-directory: frontend
+        run: |
+          npm run lint
+          npm test
+
+      # Build and test Docker
+      - name: Build and test with Docker
+        run: |
+          docker-compose build
+          docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
+          docker-compose ps
+          docker-compose down
+
+  deploy:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and push Docker images
+        run: |
+          docker-compose build
+          # Add your push commands here when ready for deployment
+          
+      - name: Deploy
+        run: |
+          echo "Deploying to production"
+          # Add your deployment commands here when ready
